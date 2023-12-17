@@ -6,6 +6,8 @@
 // Simply declare environment variable like below
 env.COMPONENT="Shipping"
 env.SONAR_URL="172.31.39.131"
+env.NEXUS_URL="172.31.86.85"
+
 maven()
 
 // To see further use check maven and helloWorld file in shared library
