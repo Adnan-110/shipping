@@ -3,6 +3,7 @@ module "shipping"{
 
   ENV                   = var.ENV
   COMPONENT             = var.COMPONENT
+  INTERNAL              = var.INTERNAL
   APP_VERSION           = var.APP_VERSION
   APP_PORT              = var.APP_PORT
   SPOT_INSTANCE         = var.SPOT_INSTANCE
