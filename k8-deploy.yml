@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping
+  labels:
+    app: shipping
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shipping
+  template:
+    metadata:
+      labels:
+        app: shipping
+    spec:
+      containers:
+      - name: shipping
+        image: 093842890430.dkr.ecr.us-east-1.amazonaws.com/shipping:v01
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: shipping-cm
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "400m"
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shipping-cm
+data:
+  CART_ENDPOINT: "cart-svc"
+  DB_HOST: "roboshop-dev-mysql.cclgwxpgogew.us-east-1.rds.amazonaws.com"
+
+# Creating ClusterIP Service ( this is the default type ) 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-svc
+spec:
+  selector:
+    app: shipping
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: shipping-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: shipping
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
